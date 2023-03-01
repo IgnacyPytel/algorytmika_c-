@@ -1,0 +1,225 @@
+#include <iostream>
+#include <ctime>
+#include <cmath>
+#include <cstdlib>
+
+using namespace std;
+//miejsce na funkcje pomocniczne
+bool sprawdzenie_czy_jest_liczba_pierwsza(int liczba){
+    if (liczba <= 1){
+        return false;
+    }
+    for(int i =2; i<=sqrt(liczba); i++){
+        if (liczba % i ==0){
+            return false;
+        }
+    }
+    return true;
+}
+void najmniejszy_element(int* tab, int rozmiar){
+    int najmniejszy = tab[0];
+    for (int i=1; i<rozmiar; i++){
+        if( tab[i]<najmniejszy){
+            najmniejszy=tab[i];
+        }
+    }
+    cout<<"najmniejszy element w tablicy to: "<<najmniejszy<<endl;
+    if (sprawdzenie_czy_jest_liczba_pierwsza(najmniejszy)){
+        cout<<"Jest liczba pierwsza."<<endl;
+    }
+    else{
+        cout<<"nie jest liczba pierwsza"<<endl;
+    }
+}
+void wypelnienietablicy(int *tab, int rozmiar, int a, int  b){
+    srand(time(NULL));
+    for(int i=0; i< rozmiar; i++){
+        tab[i] = rand()%(b-a+1)+a;
+    }
+}
+int suma_cyfr(int liczba){
+    int suma=0;
+    while(liczba>0){
+        suma += liczba%10;
+        liczba /=10;
+    }
+    return suma;
+}
+int znajdz_max_i_sume_cyfr(int** tablica, int x, int y){
+    int maxWartosc = tablica[0][0];
+    int sumacyfrMaxwartosci = suma_cyfr(maxWartosc);
+    for(int i=0; i<x;i++){
+        for(int j=0; j<y;j++){
+            if(tablica[i][j]>maxWartosc){
+                maxWartosc = tablica[i][j];
+                sumacyfrMaxwartosci = suma_cyfr(maxWartosc);
+            }
+        }
+    }
+    cout<<"najwiekszy element: "<<maxWartosc<<endl;
+    cout<<"suma cyfr tego elementu wynosi: "<<sumacyfrMaxwartosci<<endl;
+    return sumacyfrMaxwartosci;
+}
+
+void wypelnijtablice2d(int** tablica, int x, int y, int a, int b){
+    srand(time(NULL));
+    for(int i = 0; i<x;i++){
+        for(int j = 0; j<y; j++){
+            tablica[i][j] = rand()%(b-a+1)+a;
+        }
+    }
+}
+void wyswietltablice2d(int** tablica, int x,int y){
+    for(int i = 0; i<x; i++) {
+        for (int j = 0; j < y; j++) {
+            cout<< tablica[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+}
+
+
+//miejsce na funkcje pomocnicze
+void zadanie1_2(){
+    int rozmiar, a ,  b;
+
+    cout<<"Podaj rozmiar tablicy: ";
+    cin >> rozmiar;
+    cout<<"Podaj dolny zakres losowania: ";
+    cin>> a;
+    cout<<"Podaj gorny zakres losowania:";
+    cin>>b;
+    int* tab = new int[rozmiar];
+    wypelnienietablicy(tab,rozmiar,a,b);
+    najmniejszy_element(tab,rozmiar);
+    delete[] tab;
+
+}
+ void zadanie1_3(){
+    int n;
+    cout<<"Podaj rozmiar tablicy: ";
+    cin>>n;
+
+    int tab[n];
+    for (int i=0; i<n; i++){
+        tab[i]=rand()%10;
+    }
+    int count[10] = {0};
+    for(int i=0; i<n; i++){
+        count[tab[i]]++;
+    }
+    for(int i=0; i<10; i++){
+        cout<<"Cyfra: "<< i <<"pojawila sie: "<<count[i]<<"razy"<<endl;
+    }
+}
+
+void zadanie1_4(){
+    int x,y,a,b;
+    cout<<"Podaj rozmiar tablicy 2d: "<<endl;
+    cin>>x>>y;
+    cout<<"Podaj przedzial <a,b>z z ktorego maja byc losowane liczby"<<endl;
+    cin>>a>>b;
+
+    int** tablica = new int*[x];
+    for(int i =0; i<x;i++){
+        tablica[i] = new int[y];
+    }
+    wypelnijtablice2d(tablica,x,y,a,b);
+    wyswietltablice2d(tablica,x,y);
+    znajdz_max_i_sume_cyfr(tablica,x,y);
+
+    for(int i = 0; i<x; i++){
+        delete[] tablica[i];
+    }
+    delete[] tablica;
+}
+
+void zadanie1_5(int n) {
+
+    srand(time(nullptr));
+
+
+    int tab[n][n];
+
+    // Wypełnianie tablicy liczbami z przedziału <7,122>
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            tab[i][j] = rand() % 116 + 7;
+        }
+    }
+
+    cout << "Tablica " << n << "x" << n << " wypelniona liczbami z przedzialu <7,122>:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << tab[i][j] << " ";
+        }
+        cout << "\n";
+    }
+
+    double sredniaNad = 0;
+    int iloscNad = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            sredniaNad += tab[i][j];
+            iloscNad++;
+        }
+    }
+    if (iloscNad > 0) {
+        sredniaNad /= iloscNad;
+    }
+
+    double sredniaPod = 0;
+    int iloscPod = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = i+1; j < n; j++) {
+            sredniaPod += tab[i][j];
+            iloscPod++;
+        }
+    }
+    if (iloscPod > 0) {
+        sredniaPod /= iloscPod;
+    }
+
+
+    cout << "Srednia arytmetyczna elementow nad glowna przekatna: " << sredniaNad << "\n";
+    cout << "Srednia arytmetyczna elementow pod glowna aprzekatna: " << sredniaPod << "\n";
+}
+int main() {
+    int n;
+    int wybor;
+    do {
+        cout << "Wybierz zadanie do wykonania:" << endl;
+        cout << "1) Znajdz najmniejszy element i sprawdz, czy jest pierwszy" << endl;
+        cout << "2) Zlicz wystapienia cyfr w tablicy" << endl;
+        cout << "3) Znajdz element maksymalny i policz sume jego cyfr" << endl;
+        cout << "4) Policz srednie elementow powyzej i ponizej glownej przekatnej" << endl;
+        cout << "5) Wyjscie z programu" << endl;
+        cin >> wybor;
+        switch (wybor){
+            case 1:
+                zadanie1_2();
+                break;
+            case 2:
+                zadanie1_3();
+                break;
+            case 3:
+                zadanie1_4();
+                break;
+            case 4:
+                cout<<"Podaj rozmiar tablicy: ";
+                cin>>n;
+                zadanie1_5(n);
+                break;
+            case 5:
+                cout<<"Koniec programu!\n";
+                break;
+            default:
+                cout<<"Niepoprawny wybor! Wybierz jeszcze raz.\n";
+                break;
+        }
+        cout<<"\n";
+
+    } while (wybor != 5);
+
+return 0;
+}

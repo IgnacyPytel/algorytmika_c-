@@ -1,0 +1,169 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+// Funkcja przydzielająca pamięć dla tablicy jednowymiarowej
+void przydzielPamiec1D(int *&tab, int n) {
+    tab = new int[n];
+}
+
+// Funkcja przydzielająca pamięć dla tablicy dwuwymiarowej
+void przydzielPamiec2D(int **&tab, int w, int k) {
+    tab = new int*[w];
+    for (int i = 0; i < w; i++) {
+        tab[i] = new int[k];
+    }
+}
+
+// Funkcja wypełniająca tablicę jednowymiarową losowymi wartościami z przedziału <a,b>
+void wypelnijTablice1D(int *tab, int n, int a, int b) {
+    srand(time(NULL));
+    for (int i = 0; i < n; i++) {
+        tab[i] = rand() % (b - a + 1) + a;
+    }
+}
+
+// Funkcja wypełniająca tablicę dwuwymiarową losowymi wartościami z przedziału <a,b>
+void wypelnijTablice2D(int **tab, int w, int k, int a, int b) {
+    srand(time(NULL));
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < k; j++) {
+            tab[i][j] = rand() % (b - a + 1) + a;
+        }
+    }
+}
+
+// Funkcja usuwająca pamięć z tablicy jednowymiarowej
+void usunTablice1D(int *&tab) {
+    delete[] tab;
+    tab = NULL;
+}
+
+// Funkcja usuwająca pamięć z tablicy dwuwymiarowej
+void usunTablice2D(int **&tab, int w) {
+    for (int i = 0; i < w; i++) {
+        delete[] tab[i];
+    }
+    delete[] tab;
+    tab = NULL;
+}
+
+// Funkcja wyświetlająca zawartość tablicy jednowymiarowej
+void wyswietl1D(int* tab, int n) {
+    for (int i = 0; i < n; i++) {
+        cout << tab[i] << " ";
+    }
+    cout << endl;
+}
+
+// Funkcja wyświetlająca zawartość tablicy dwuwymiarowej
+void wyswietl2D(int** tab, int w, int k) {
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < k; j++) {
+            cout << tab[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int *tab1D;
+    int **tab2D;
+    int n = 10;
+    int w = 5, k = 5;
+    int a = 0, b = 9;
+    int wybor;
+    do {
+        cout << "MENU GLOWNE" << endl;
+        cout << "1. Przydziel pamiec dla tablicy 1D" << endl;
+        cout << "2. Przydziel pamiec dla tablicy 2D" << endl;
+        cout << "3. Wypelnij tablice 1D" << endl;
+        cout << "4. Wypelnij tablice 2D" << endl;
+        cout << "5. Wyswietl zawartosc tablicy 1D" << endl;
+        cout << "6. Wyswietl zawartosc tablicy 2D" << endl;
+        cout << "7. Usun tablice 1D" << endl;
+        cout << "8. Usun tablice 2D" << endl;
+        cout << "9. Wyjdz z programu" << endl;
+        cout << "Wybierz opcje: ";
+        cin >> wybor;
+
+        switch (wybor) {
+            case 1:
+                cout << "Podaj rozmiar tablicy: ";
+                cin >> n;
+                przydzielPamiec1D(tab1D, n);
+                cout << "Tablica 1D zostala przydzielona." << endl;
+                break;
+            case 2:
+                cout << "Podaj wymiary tablicy: ";
+                cin >> w >> k;
+                przydzielPamiec2D(tab2D, w, k);
+                cout << "Tablica 2D zostala przydzielona." << endl;
+                break;
+            case 3:
+                if (tab1D != NULL) {
+                    cout << "Podaj przedzial liczb: ";
+                    cin >> a >> b;
+                    wypelnijTablice1D(tab1D, n, a, b);
+                    cout << "Tablica 1D zostala wypelniona." << endl;
+                } else {
+                    cout << "Tablica 1D nie zostala jeszcze przydzielona!" << endl;
+                }
+                break;
+
+            case 4:
+                if (tab2D == NULL) {
+                    cout << "Nie zaalokowano pamięci dla tablicy 2D\n";
+                    break;
+                }
+
+                cout << "Podaj zakres generowanych liczb <a b>: ";
+                cin >> a >> b;
+                wypelnijTablice2D(tab2D, w, k, a, b);
+                break;
+
+            case 5:
+                if (tab1D == NULL) {
+                    cout << "Nie zaalokowano pamięci dla tablicy 1D\n";
+                    break;
+                }
+
+                wyswietl1D(tab1D, n);
+                break;
+            case 6:
+                if (tab2D == NULL) {
+                    cout << "Tablica dwuwymiarowa nie zostala jeszcze stworzona!\n";
+                } else {
+                    wyswietl2D(tab2D, w, k);
+                }
+                break;
+            case 7:
+                if (tab1D == NULL) {
+                    cout << "Tablica jednowymiarowa nie zostala jeszcze stworzona!\n";
+                } else {
+                    usunTablice1D(tab1D);
+                    cout << "Tablica jednowymiarowa zostala usunieta.\n";
+                }
+                break;
+            case 8:
+                if (tab2D == NULL) {
+                    cout << "Tablica dwuwymiarowa nie zostala jeszcze stworzona!\n";
+                } else {
+                    usunTablice2D(tab2D, w);
+                    cout << "Tablica dwuwymiarowa zostala usunieta.\n";
+                }
+                break;
+            case 9:
+                cout << "Koniec programu.\n";
+                break;
+            default:
+                cout << "Niepoprawny wybor! Wybierz jeszcze raz.\n";
+                break;
+        }
+        cout << "\n";
+    } while (wybor != 9);
+
+    return 0;
+}
