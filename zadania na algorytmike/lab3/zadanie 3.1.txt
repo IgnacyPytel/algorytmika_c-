@@ -1,0 +1,90 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+struct student{
+    string imie;
+    string nazwisko;
+    int punkty;
+    // dla nowego studenta przypisuje wartosc 0 w punktach
+    student() : punkty(0) {}
+};
+
+void wczytajStudentow(student*& tab, int& n){
+    ifstream  plik("studenci.csv");
+    if(!plik.is_open()){
+        cout<<"Nie mozna otworzyc pliku.\n";
+        exit(1);
+    }
+    plik >> n;
+    tab = new student[n];
+    string imie,nazwisko;
+    int punkty;
+    for( int i =0; i<n; i++){
+        plik >> imie>> nazwisko>> punkty;
+        tab[i].imie = imie;
+        tab[i].nazwisko = nazwisko;
+        tab[i].punkty = punkty;
+    }
+    plik.close();
+
+}
+void usunTabliceStudentow(student*& tab){
+    delete[] tab;
+    tab = nullptr;
+}
+void wyswietlStudentow(student* tab, int n){
+    for (int i =0; i<n; i++){
+        cout<< tab[i].imie <<" "<< tab[i].nazwisko << " "<< tab[i].punkty<<endl;
+    }
+}
+void QuickSort(student* tab, int n, int tryb){
+    if (n <= 1){
+        return;
+    }
+    int pivot = tab[n/2].punkty;
+    int i = 0, j=n-1;
+    while(i<=j){
+        if (tryb ==1){
+            while(tab[i].punkty < pivot) i++;
+            while(tab[j].punkty > pivot) j--;
+        }
+        else if (tryb ==2) {
+            while(tab[i].punkty>pivot) i++;
+            while(tab[j].punkty < pivot) j--;
+        }
+        else{
+            cout<<"Niepoprawny tryb!";
+            return;
+        }
+        if (i<=j){
+            swap(tab[i], tab[j]);
+            i++;
+            j--;
+        }
+    }
+    QuickSort(tab, j + 1, tryb);
+    QuickSort(tab + i, n - i, tryb);
+}
+
+int main(){
+    int n;
+    student* tab;
+
+    wczytajStudentow(tab,n);
+    cout<< " Przed sortowaniem:\n";
+    wyswietlStudentow(tab,n);
+
+    cout << "Wpisz 1, aby posortowac rosnaco, lub 2, aby posortowac malejaco: ";
+    int tryb;
+    cin>>tryb;
+
+    QuickSort(tab, n, tryb);
+
+    cout<< "Po sortowaniu:\n";
+    wyswietlStudentow(tab,n);
+    usunTabliceStudentow(tab);
+    return 0;
+}
