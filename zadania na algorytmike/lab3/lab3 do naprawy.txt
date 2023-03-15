@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <algorithm>
+#include <sstream>
+
+using namespace std;
+
+struct student{
+    string imie;
+    string nazwisko;
+    int punkty;
+};
+
+void wczytajStudentow(student*&tab, int &liczbaStudentow){
+    string sciezka,linia,pomoc;
+    ifstream plik;
+    char sredniki;
+    sciezka = "studenci.csv";
+    plik.open(sciezka);
+    plik>>liczbaStudentow;
+    for(int i = 0; i<2;i++){
+        plik >> sredniki;
+    }
+    tab =  new student[liczbaStudentow];
+    for(int i = 0;  i<liczbaStudentow; i++){
+        plik>>linia;
+        stringstream ss(linia);
+        getline(ss,tab[i].imie, ';');
+        getline(ss, tab[i].nazwisko, ';');
+        getline(ss, pomoc);
+        tab[i].punkty=atoi(pomoc.c_str());
+    }
+    plik.close();
+}
+
+void wyswietlStudentow(student* tab, int n){
+    for (int i = 0; i<n; i++){
+        cout<< tab[i].imie <<" "<< tab[i].nazwisko << " "<< tab[i].punkty<<endl;
+    }
+}
+
+void usunTabliceStudentow(student*& tab){
+    delete[] tab;
+    tab = nullptr;
+}
+
+
+
+
+void sortowanieQuickSort(student* tab, int n, int tryb){
+    if (n<=1){
+        return;
+    }
+    int pivot = tab[n/2].punkty;
+    int i = 0, j = n - 1;
+    while(i<=j){
+        if (tryb==1){
+            while(tab[i].punkty < pivot) i++;
+            while(tab[j].punkty > pivot) j--;
+        }
+        else if (tryb==2){
+            while(tab[i].punkty > pivot) i++;
+            while(tab[j].punkty < pivot) j--;
+        }
+        else{
+            cout<<"Niepoprawny tryb!";
+            return;
+        }
+        if (j<=j){
+            swap(tab[i], tab[j]);
+            i++;
+            j--;
+        }
+    }
+
+sortowanieQuickSort(tab, j+1, tryb);
+sortowanieQuickSort(tab + i, n - i, tryb);
+}
+
+int main()
+{
+    int n, liczbaStudentow;
+    student* tab;
+
+    wczytajStudentow(tab,n);
+    cout<< "Przed sortowaniem: \n";
+    wyswietlStudentow(tab,n);
+
+
+    cout<<"Wpisz 1 aby posortowac rosnaco albo 2 aby posortowac malejaco: \n";
+    int tryb;
+    cin>>tryb;
+
+    sortowanieQuickSort(tab, n, tryb);
+
+    cout<<"Po sortowaniu: \n";
+    wyswietlStudentow(tab,n);
+    usunTabliceStudentow(tab);
+    return 0;
+}
