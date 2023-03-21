@@ -1,0 +1,118 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+class Student {
+public:
+    std::string imie;
+    std::string nazwisko;
+    int punkty;
+
+    Student(std::string imie = "", std::string nazwisko = "", int punkty = 0)
+    : imie(imie), nazwisko(nazwisko), punkty(punkty) {};
+
+    bool operator<(const Student& s) const {
+        return punkty < s.punkty;
+    }
+    bool operator>(const Student& s) const {
+        return punkty > s.punkty;
+    }
+
+    Student operator*(int tryb) {
+        return Student(imie, nazwisko, punkty * tryb);
+    }
+
+    std::istream& read(std::istream& is) {
+        std::string temp;
+        std::getline(is, imie, ';');
+        std::getline(is, nazwisko, ';');
+        is >> punkty;
+        std::getline(is, temp);
+        return is;
+    }
+
+    std::ostream& print(std::ostream& os) const {
+        os << imie << " " << nazwisko << " " << punkty << std::endl;
+        return os;
+    }
+};
+
+std::istream& operator>>(std::istream& is, Student& s) {
+    return s.read(is);
+}
+
+std::ostream& operator<<(std::ostream& os, const Student& s) {
+    return s.print(os);
+}
+
+
+template <typename T>
+void sortowanieQuickSort(std::vector<T>& vec, int l, int r, int tryb);
+
+void wczytajStudentow(std::vector<Student> &vec, size_t n, std::istream& file);
+void wyswietlStudentow(const std::vector<Student>& vec);
+
+
+int main() {
+    std::ifstream file("studenci.csv");
+    size_t n;
+    file >> n;
+    std::string line;
+    std::getline(file, line);
+    int tryb;
+    std::cout << "Tryb sortowania (1 rosnaca -1 malejaca): ";
+    std::cin >> tryb;
+
+    std::vector<Student> vec(n);
+    wczytajStudentow(vec, vec.size(), file);
+    wyswietlStudentow(vec);
+    std::cout << std::endl;
+
+    sortowanieQuickSort(vec, 0, vec.size() - 1, tryb);
+//    std::sort(vec.begin(), vec.end());
+    wyswietlStudentow(vec);
+
+    file.close();
+
+}
+
+template <typename T>
+void sortowanieQuickSort(std::vector<T>& vec, int l, int r, int tryb)
+{
+    int mid = (l + r) / 2;
+    T pivot = vec[mid];
+    vec[mid] = vec[r];
+    int bound = l;
+    int i = l;
+
+    while (i < r) {
+        if (vec[i] * tryb < pivot * tryb) {
+            std::swap(vec[i], vec[bound]);
+            bound++;
+        }
+        i++;
+    }
+
+    vec[r] = vec[bound];
+    vec[bound] = pivot;
+
+    if (l < bound - 1)
+        sortowanieQuickSort(vec, l, bound - 1, tryb);
+    if (bound + 1 < r)
+        sortowanieQuickSort(vec, bound + 1, r, tryb);
+}
+
+void wczytajStudentow(std::vector<Student> &vec, size_t n, std::istream& file)
+{
+    for (auto& e : vec)
+        file >> e;
+}
+
+void wyswietlStudentow(const std::vector<Student>& vec)
+{
+    for (const auto& e : vec)
+        std::cout << e;
+    std::cout << std::endl;
+}
