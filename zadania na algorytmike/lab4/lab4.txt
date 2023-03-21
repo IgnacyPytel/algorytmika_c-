@@ -1,0 +1,227 @@
+z 4.1
+#include <iostream>
+#include <fstream>
+
+int* readDataFromFile(const std::string& fileName, int& size) {
+    std::ifstream file(fileName);
+    if (!file.is_open()) {
+        std::cerr << "Could not open file: " << fileName << "\n";
+        return nullptr;
+    }
+    file >> size;
+    int* array = new int[size];
+    for (int i = 0; i < size; i++) {
+        file >> array[i];
+    }
+    file.close();
+    return array;
+}
+
+int main() {
+    int size;
+    int* array = readDataFromFile("data.txt", size);
+    if (array == nullptr) {
+        return 1;
+    }
+    for (int i = 0; i < size; i++) {
+        std::cout << array[i] << " ";
+    }
+    std::cout << "\n";
+    delete[] array;
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+z 4.2
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+struct Student {
+    std::string name;
+    int points;
+};
+
+void divideStudents(const std::vector<Student>& students, std::vector<Student>& lessOrEqual, std::vector<Student>& greater) {
+    for (const auto& student : students) {
+        if (student.points <= 10) {
+            lessOrEqual.push_back(student);
+        } else {
+            greater.push_back(student);
+        }
+    }
+}
+
+void printStudents(const std::vector<Student>& students, const std::string& label) {
+    std::cout << label << "\n";
+    for (const auto& student : students) {
+        std::cout << student.name << " " << student.points << "\n";
+    }
+}
+
+int main() {
+    std::vector<Student> students;
+    std::ifstream file("students.txt");
+    std::string name;
+    int points;
+    while (file >> name >> points) {
+        students.push_back({name, points});
+    }
+    file.close();
+
+    printStudents(students, "All students:");
+
+    std::vector<Student> lessOrEqual;
+    std::vector<Student> greater;
+    divideStudents(students, lessOrEqual, greater);
+
+    printStudents(lessOrEqual, "Students who scored <=10 points:");
+    printStudents(greater, "Students who scored >10 points:");
+
+    return 0;
+}
+
+
+z 4.3
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+void printArray(const std::vector<int>& array, const std::string& label) {
+    std::cout << "Studenci, którzy otrzymali " << label << ":\n";
+    for (int value : array) {
+        std::cout << value << " ";
+    }
+    std::cout << "\n";
+}
+
+std::vector<int> splitArrayByModulo(const int* array, int size, int modulo) {
+    std::vector<int> result;
+    for (int i = 0; i < size; i++) {
+        if (array[i] % 3 == modulo) {
+            result.push_back(array[i]);
+        }
+    }
+    return result;
+}
+
+int main() {
+    int size;
+    int* array;
+    std::ifstream file("data.txt");
+    if (!file.is_open()) {
+        std::cerr << "Could not open file: data.txt\n";
+        return 1;
+    }
+    file >> size;
+    array = new int[size];
+    for (int i = 0; i < size; i++) {
+        file >> array[i];
+    }
+    file.close();
+
+    std::vector<int> modulo0 = splitArrayByModulo(array, size, 0);
+    std::vector<int> modulo1 = splitArrayByModulo(array, size, 1);
+    std::vector<int> modulo2 = splitArrayByModulo(array, size, 2);
+
+    std::cout << "Studenci przed podziałem:\n";
+    for (int i = 0; i < size; i++) {
+        std::cout << array[i] << " ";
+    }
+    std::cout << "\n";
+
+    printArray(modulo0, "liczbę punktów podzielną przez 3");
+    printArray(modulo1, "liczbę punktów podzielną przez 3 z resztą 1");
+    printArray(modulo2, "liczbę punktów podzielną przez 3 z resztą 2");
+
+    delete[] array;
+    return 0;
+}
+
+
+
+do przetestowania:
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+// struktura przechowująca dane studenta
+struct Student {
+    string imie;
+    string nazwisko;
+    int punkty;
+};
+
+// funkcja wczytująca dane studentów z pliku
+vector<Student> wczytajDane(string nazwaPliku) {
+    vector<Student> studenci;
+    ifstream plik(nazwaPliku);
+    if (plik.is_open()) {
+        string linia;
+        while (getline(plik, linia)) {
+            Student s;
+            size_t poz = 0;
+            poz = linia.find(',', poz);
+            s.imie = linia.substr(0, poz);
+            poz++;
+            size_t poprzedniaPoz = poz;
+            poz = linia.find(',', poz);
+            s.nazwisko = linia.substr(poprzedniaPoz, poz - poprzedniaPoz);
+            poz++;
+            s.punkty = stoi(linia.substr(poz));
+            studenci.push_back(s);
+        }
+        plik.close();
+    }
+    return studenci;
+}
+
+// funkcja wyświetlająca dane studentów
+void wyswietlDane(vector<Student> studenci) {
+    for (auto s : studenci) {
+        cout << s.imie << " " << s.nazwisko << " " << s.punkty << endl;
+    }
+}
+
+// funkcja podziału studentów na dwie grupy
+void podzielStudentow(vector<Student> studenci, vector<Student>& grupa1, vector<Student>& grupa2) {
+    for (auto s : studenci) {
+        if (s.punkty <= 10) {
+            grupa1.push_back(s);
+        }
+        else {
+            grupa2.push_back(s);
+        }
+    }
+}
