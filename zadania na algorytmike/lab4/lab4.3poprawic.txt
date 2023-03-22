@@ -1,0 +1,151 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <algorithm>
+#include <sstream>
+
+using namespace std;
+
+struct student{
+    string imie;
+    string nazwisko;
+    int punkty;
+};
+
+void wczytajStudentow(student*&tab, int &liczbaStudentow){
+    string sciezka,linia,pomoc;
+    ifstream plik;
+    char sredniki;
+    sciezka = "studenci.csv";
+    plik.open(sciezka);
+    plik>>liczbaStudentow;
+    for(int i = 0; i<2;i++){
+        plik >> sredniki;
+    }
+    tab =  new student[liczbaStudentow];
+    for(int i = 0;  i<liczbaStudentow; i++){
+        plik>>linia;
+        stringstream ss(linia);
+        getline(ss,tab[i].imie, ';');
+        getline(ss, tab[i].nazwisko, ';');
+        getline(ss, pomoc);
+        tab[i].punkty=atoi(pomoc.c_str());
+    }
+    plik.close();
+}
+
+
+void wyswietlStudentow(student* tab, int n){
+    for (int i = 0; i<n; i++){
+        cout<< tab[i].imie <<" "<< tab[i].nazwisko << " "<< tab[i].punkty<<endl;
+    }
+}
+
+void usunTabliceStudentow(student*& tab){
+    delete[] tab;
+    tab = nullptr;
+}
+
+void sortowanie_na_dwie_czesci(student* tab, int n, int granica){
+    int i = 0;
+    int j=n-1;
+    while(i<j){
+        while(tab[i].punkty<=granica && i<j){
+            i++;
+        }
+        while(tab[j].punkty>granica && i<j){
+            j--;
+        }
+        if(i<j){
+            swap(tab[i],tab[j]);
+            i++;
+            j--;
+        }
+        if(tab[i].punkty<=granica){
+             i+1;
+        }
+        i;
+    }
+
+}
+void wyswietlaniestudentow(student *tab, int n, int granica){
+
+    for(int i = 0; i<n; i++){
+        cout<<tab[i].imie<<" "<<tab[i].nazwisko<<" "<<tab[i].punkty<<endl;
+        if(tab[i].punkty==2){
+            cout<<endl;
+            cout<<"Miejsce podzialu: "<<endl;
+        }
+    }
+    cout<<endl;
+}
+
+
+
+
+
+
+
+void sortowanie_na_trzy_czesci(student* tab, int &liczbaStudentow, int granica1, int granica2){
+    int i = -1;
+    int j =0;
+    int k = liczbaStudentow;
+    while(j<k){
+        if(tab[j].punkty<=granica1){
+            i=i+1;
+            swap(tab[i], tab[j]);
+            j=j+1;
+        }
+        else{
+            if(tab[j].punkty>granica2){
+                k=k-1;
+                swap(tab[k],tab[j]);
+            }
+            else{
+                j=j+1;
+            }
+        }
+    }
+ granica1 = i;
+ granica2 = k;
+}
+void zadanie4_1(){
+    int n,liczbaStudentow;
+    student* tab;
+
+    wczytajStudentow(tab,n);
+    cout<< "Tablica studentow: \n";
+    wyswietlStudentow(tab,n);
+    usunTabliceStudentow(tab);
+
+}
+void zadanie4_2(){
+    int n,liczbaStudentow;
+    int granica = 10;
+    student* tab;
+    wczytajStudentow(tab,n);
+    cout<< "Tablica studentow przed sortowaniem na dwie czesci: \n";
+    wyswietlStudentow(tab,n);
+    cout<<"Tablica studentow po sortowaniu: \n";
+    sortowanie_na_dwie_czesci(tab,n,granica);
+    wyswietlaniestudentow(tab,n,granica);
+    usunTabliceStudentow(tab);
+
+
+}
+
+void zadanie4_3(){
+    int granica1;
+    int granica2;
+
+    int n,liczbaStudentow;
+    int granica = 10;
+    student* tab;
+    wczytajStudentow(tab,n);
+    sortowanie_na_trzy_czesci(tab, n, granica1, granica2);
+
+}
+int main(){
+    zadanie4_2();
+    return 0;
+}
