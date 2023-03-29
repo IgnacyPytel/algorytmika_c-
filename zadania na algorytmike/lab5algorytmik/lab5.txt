@@ -1,0 +1,151 @@
+#include <iostream>
+
+using namespace std;
+
+void wczytywanie(string tekst, string wzorzec){
+    cout<<"Podaj tekst: ";
+    cin.ignore();
+    getline(cin,tekst);
+    cout<<"Podaj wzorzec: ";
+    getline(cin,wzorzec);
+}
+
+
+
+
+
+
+void procuedure_naiwny(string tekst,string wzorzec){
+    int i = 0;
+    int j = 0;
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    while (i<=dlT-dlW){
+        int j = 0;
+        while(j<dlW && wzorzec[j]==tekst[i+j]){}
+        j++;
+    }
+    if (j==dlW){
+        cout<<i;
+    }
+    i++;
+}
+void procedure_zbudujTabliceDopasowan(string wzorzec,string tekst,int p[]){
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    p[dlT];
+    p[0]=0;
+    p[1]=0;
+    int t=0;
+    int i=1;
+    while(i<dlW){
+        while(t>0 && wzorzec[t]!=wzorzec[i]){
+            t=p[t];
+        }
+        if(wzorzec[t]==wzorzec[i]){
+            t++;
+            p[i+1]=t;
+            i++;
+        }
+    }
+}
+void procedure_KMP(string wzorzec, string tekst,int p[]){
+    int i = 0;
+    int j = 0;
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    p[dlT];
+    while(i<dlT-dlW+1){
+        while(wzorzec[j]==tekst[i+j]&&j<dlW){
+            j++;
+        }
+        if(j==dlW){
+            i=i+max(1,j-p[j]);
+            j=p[j];
+        }
+    }
+}
+
+
+void procedure_tablicaPrzesuniec(string wzorzec,string tekst, int p[]){
+    int n_pocz = 65;
+    int n_kon = 122;
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    p[dlT];
+    int i = 0;
+    while(i<= n_kon-n_pocz){
+        p[i]=-1;
+        i++;
+    }
+    i = 0;
+    while(i<dlW){
+        p[wzorzec[i]-n_pocz]=i;
+        i++;
+    }
+}
+
+void procedure_BM(string wzorzec, string tekst,int p[]){
+    int n_pocz = 65;
+    int i=0;
+    int j=0;
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    p[dlT];
+    while(i<=dlT-dlW){
+        j=dlW-1;
+            while(j>-1 && wzorzec[j]==tekst[i+j]){
+                j--;
+            }
+
+        if(j==-1){
+            i++;
+        }
+        else{
+            i=i+max(1,j-p[tekst[i+j]-n_pocz]);
+        }
+    }
+
+
+
+}
+
+
+int main()
+{
+    string wzorzec,tekst;
+    int wybor;
+    int dlT = tekst.length();
+    int dlW =  wzorzec.length();
+    int p[dlT];
+    do{
+        cout << "1.) wczytaj dane"<< endl;
+        cout << "2.) alogrytm naiwny"<< endl;
+        cout << "3.) alogrytm KMP"<< endl;
+        cout << "4.) alogrytm BM"<< endl;
+        cout << "5.) wyjscie z programu"<< endl;
+        cin >> wybor;
+        switch (wybor){
+        case 1:
+            wczytywanie(wzorzec,tekst);
+            break;
+        case 2:
+            procuedure_naiwny(wzorzec,tekst);
+            break;
+        case 3:
+            procedure_tablicaPrzesuniec(wzorzec,tekst,p);
+            procedure_KMP(wzorzec,tekst,p);
+            break;
+        case 4:
+            procedure_zbudujTabliceDopasowan(wzorzec,tekst,p);
+            procedure_BM(wzorzec,tekst,p);
+
+        case 5:
+            break;
+        default:
+            cout<<"Niepoprawny wybor! Wybierz jeszcze raz.\n";
+            break;
+        }
+    }while(wybor!=5);
+    return 0;
+}
