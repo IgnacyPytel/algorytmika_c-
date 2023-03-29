@@ -151,7 +151,7 @@ int main()
                 wczytywanie(wzorzec,tekst);
                 break;
             case 2:
-                zad5_1(tekst,wzorzec);
+                zad5_1(wzorzec,tekst);
                 break;
             case 3:
                 zadanie_5_3();
