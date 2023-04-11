@@ -1,0 +1,77 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+const int prime = 101; // podstawa dla funkcji haszującej
+
+int hashFunction(char s, int exp, int p, int off) {
+    return (s - off) * exp % p;
+}
+
+vector<int> searchPattern(const string& pattern, const string& text) {
+    int n = text.length();
+    int m = pattern.length();
+    int p = prime;
+
+    // wartość hasha wzorca
+    int patternHash = 0;
+    for (int i = 0; i < m; i++) {
+        patternHash = (patternHash + hashFunction(pattern[i], 1, p, 'a')) % p;
+    }
+
+    // wartości hasha dla kolejnych podciągów tekstu o długości m
+    vector<int> textHash(n - m + 1);
+    int textSubstringHash = 0;
+    for (int i = 0; i < m; i++) {
+        textSubstringHash = (textSubstringHash + hashFunction(text[i], 1, p, 'a')) % p;
+    }
+    textHash[0] = textSubstringHash;
+    for (int i = m; i < n; i++) {
+        textSubstringHash = (textSubstringHash - hashFunction(text[i-m], 1, p, 'a') + p) % p;
+        textSubstringHash = (textSubstringHash * prime + hashFunction(text[i], m-1, p, 'a')) % p;
+        textHash[i-m+1] = textSubstringHash;
+    }
+
+    // wyszukiwanie wzorca w tekście
+    vector<int> positions;
+    for (int i = 0; i < n - m + 1; i++) {
+        if (textHash[i] == patternHash) {
+            if (text.substr(i, m) == pattern) {
+                positions.push_back(i);
+            }
+        }
+    }
+
+    return positions;
+}
+
+int main() {
+    ifstream inputFile("tekst.txt");
+
+    // odczytanie wzorca z pierwszej linii pliku
+    string pattern;
+    getline(inputFile, pattern);
+
+    // wyszukiwanie wzorca w kolejnych liniach pliku
+    string line;
+    int lineNumber = 2;
+    while (getline(inputFile, line)) {
+        vector<int> positions = searchPattern(pattern, line);
+        cout << "Linijka " << lineNumber << ": ";
+        if (positions.empty()) {
+            cout << "-1";
+        } else {
+            for (int pos : positions) {
+                cout << pos << " ";
+            }
+        }
+        cout << endl;
+        lineNumber++;
+    }
+
+    inputFile.close();
+    return 0;
+}
