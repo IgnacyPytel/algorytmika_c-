@@ -1,0 +1,68 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <cmath>
+
+#define MAX_L 1000
+#define P 257
+
+using namespace std;
+
+
+unsigned long long hash1(string s, int p)
+{
+    int n = s.size();
+    unsigned long long h = 0;
+    for (int i = 0; i < n; i++)
+{
+        h += (unsigned long long)s[i] * pow(p, i);
+    }
+    return h;
+}
+
+
+unsigned long long nadpisz_hash(unsigned long long h, int p, int stary_znak, int nowy_znak, int exp)
+{
+    h -= stary_znak * pow(p, exp);
+    h += nowy_znak * pow(p, exp);
+    return h;
+}
+
+int main()
+{
+    ifstream file("tekst.txt");
+    if (!file)
+{
+        cout << "Nie udalo sie otworzyc pliku." << endl;
+        return 1;
+    }
+    string wzorzec;
+    getline(file, wzorzec);
+    int p_len = wzorzec.size();
+    unsigned long long wzorzec_hash = hash1(wzorzec, P);
+    string linia;
+    int numer_linii = 1;
+    while (getline(file, linia))
+{
+        int l_len = linia.size();
+        bool znaleziony = false;
+        cout << "Linijka " << numer_linii << ": ";
+        for (int i = 0; i <= l_len - p_len; i++)
+{
+            string odejm = linia.substr(i, p_len);
+            if (hash1(odejm, P) == wzorzec_hash)
+{
+                znaleziony = true;
+                cout << i << " ";
+            }
+        }
+        if (!znaleziony) {
+            cout << "-1";
+        }
+        cout << endl;
+        numer_linii++;
+    }
+
+    file.close();
+    return 0;
+}
