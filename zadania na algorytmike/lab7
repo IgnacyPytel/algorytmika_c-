@@ -1,1 +1,146 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <algorithm>
+#include <sstream>
 
+using namespace std;
+
+struct student{
+    string imie;
+    string nazwisko;
+    int punkty;
+};
+
+void wczytajStudentow(student*&tab, int &liczbaStudentow){
+    string sciezka,linia,pomoc;
+    ifstream plik;
+    char sredniki;
+    sciezka = "studenci.csv";
+    plik.open(sciezka);
+    plik>>liczbaStudentow;
+    for(int i = 0; i<2;i++){
+        plik >> sredniki;
+    }
+    tab =  new student[liczbaStudentow];
+    for(int i = 0;  i<liczbaStudentow; i++){
+        plik>>linia;
+        stringstream ss(linia);
+        getline(ss,tab[i].imie, ';');
+        getline(ss, tab[i].nazwisko, ';');
+        getline(ss, pomoc);
+        tab[i].punkty=atoi(pomoc.c_str());
+    }
+    plik.close();
+}
+
+
+void wyswietlStudentow(student* tab, int n){
+    for (int i = 0; i<n; i++){
+        cout<< tab[i].imie <<" "<< tab[i].nazwisko << " "<< tab[i].punkty<<endl;
+    }
+}
+
+void usunTabliceStudentow(student*& tab){
+    delete[] tab;
+    tab = nullptr;
+}
+void wyszukajStudentow(student* tab, int n, int punkty){
+    bool znaleziono = false;
+    for (int i = 0; i<n; i++){
+        if (tab[i].punkty == punkty){
+            cout<< tab[i].imie <<" "<< tab[i].nazwisko << endl;
+            znaleziono = true;
+        }
+    }
+    if (!znaleziono){
+        cout<<"Nie znaleziono studentow o podanej liczbie punktow"<<endl;
+    }
+}
+void sortujStudentow(student* tab, int n){
+    for (int i = 0; i < n-1; i++){
+        for (int j = 0; j < n-i-1; j++){
+            if (tab[j].punkty > tab[j+1].punkty){
+                swap(tab[j], tab[j+1]);
+            }
+        }
+    }
+}
+
+int wyszukajPunkty(student* tab, int n, int szukana){
+    int lewy = 0, prawy = n-1;
+    while (lewy <= prawy){
+        int srodek = (lewy + prawy)/2;
+        if (tab[srodek].punkty == szukana){
+            return srodek;
+        } else if (tab[srodek].punkty < szukana){
+            lewy = srodek + 1;
+        } else {
+            prawy = srodek - 1;
+        }
+    }
+    return -1;
+}
+void zapiszWyniki(student* tab, int n, int szukana){
+    ofstream plik("wyniki.csv");
+    bool znaleziono = false;
+    for (int i = 0; i < n; i++){
+        if (tab[i].punkty == szukana){
+            znaleziono = true;
+            plik << tab[i].imie << ";" << tab[i].nazwisko << endl;
+        }
+    }
+    if (!znaleziono){
+        plik << "Brak wynikow dla " << szukana << " punktow." << endl;
+    }
+    plik.close();
+}
+
+void zadanie_7_1(){
+    student* tab;
+    int liczbaStudentow,punkty1;
+    cout<<"Podaj liczbe punktow:"<<endl;
+    cin>>punkty1;
+    wczytajStudentow(tab, liczbaStudentow);
+    wyszukajStudentow(tab, liczbaStudentow, punkty1);
+    usunTabliceStudentow(tab);
+}
+void zadanie_7_2(){
+    student* tab;
+    int liczbaStudentow,punkty1;
+    cout<<"Podaj liczbe punktow:"<<endl;
+    cin>>punkty1;
+    wczytajStudentow(tab, liczbaStudentow);
+    sortujStudentow(tab,liczbaStudentow);
+    wyszukajPunkty(tab,liczbaStudentow,punkty1);
+    zapiszWyniki(tab,liczbaStudentow,punkty1);
+}
+int main(){
+    int wybor;
+
+    cout << "Menu wyboru:" << endl;
+    cout << "1. zadanie 7.1" << endl;
+    cout << "2. zadanie 7.2" << endl;
+    cout << "3. Wyjscie" << endl;
+
+    cout << "Wybierz opcje: ";
+    cin >> wybor;
+
+    switch (wybor) {
+        case 1:
+            cout << "Wybrano zadanie 7.1" << endl;
+            zadanie_7_1();
+            break;
+        case 2:
+            cout << "Wybrano zadanie 7.2" << endl;
+            zadanie_7_2();
+            break;
+        case 4:
+            cout << "Wybrano opcję wyjscia" << endl;
+            break;
+        default:
+            cout << "Niepoprawny wybor, sprobuj ponownie." << endl;
+            break;
+    }
+    return 0;
+}
