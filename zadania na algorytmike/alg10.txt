@@ -55,6 +55,26 @@ char getFront(const Queue& queue) {
         return queue.head->data;
     }
 }
+void dequeue2(Queue& queue) {
+    if (isEmpty(queue)) {
+        std::cout << "Kolejka jest pusta" << std::endl;
+    } else {
+        QueueNode* temp = queue.head;
+        queue.head = queue.head->next;
+
+        std::cout << "Element: " << temp->data << std::endl;
+        delete temp;
+
+        if (queue.head == nullptr) {
+            queue.tail = nullptr;
+        }
+    }
+}
+void seeQueue(Queue& queue) {
+    while (!isEmpty(queue)) {
+        dequeue2(queue);
+    }
+}
 
 void clearQueue(Queue& queue) {
     while (!isEmpty(queue)) {
@@ -79,6 +99,21 @@ void loadFromFile(Queue& queue, const std::string& filename) {
 
     file.close();
 }
+void displayQueue(const Queue& queue){
+    if (isEmpty(queue))
+    {
+        std::cout<<"Kolejka jest pusta."<<std::endl;
+    }
+    else{
+        std::cout<<"kolejka: ";
+        QueueNode* current = queue.head;
+        while(current != nullptr){
+            std::cout << current->data<<" ";
+            current = current->next;
+        }
+        std::cout<<std::endl;
+    }
+}
 
 void displayMenu() {
     std::cout << "======== MENU ========" << std::endl;
@@ -88,7 +123,8 @@ void displayMenu() {
     std::cout << "4. Pobierz pierwszy element z kolejki" << std::endl;
     std::cout << "5. Usun wszystkie elementy z kolejki" << std::endl;
     std::cout << "6. Wczytaj duze litery z pliku" << std::endl;
-    std::cout << "7. Wyjscie" << std::endl;
+    std::cout << "7. Pokaz kolejke" << std::endl;
+    std::cout << "8. Wyjscie" << std::endl;
     std::cout << "=======================" << std::endl;
     std::cout << "Wybierz opcje: ";
 }
@@ -137,13 +173,16 @@ int main() {
                 loadFromFile(queue, filename);
                 break;
             case 7:
+                displayQueue(queue);
+                break;
+            case 8:
                 std::cout << "Do widzenia!" << std::endl;
                 break;
             default:
                 std::cout << "Nieznana opcja. Wybierz ponownie." << std::endl;
                 break;
         }
-    } while (choice != 7);
+    } while (choice != 8);
 
     return 0;
 }
