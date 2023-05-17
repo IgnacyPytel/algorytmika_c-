@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <ctime>
+
 
 struct QueueNode {
     QueueNode* next;
@@ -17,7 +17,7 @@ bool isEmpty(const Queue& queue) {
     return queue.head == nullptr;
 }
 
-void enqueue(Queue& queue, char data) {
+void push(Queue& queue, char data) {
     QueueNode* newNode = new QueueNode;
     newNode->data = data;
     newNode->next = nullptr;
@@ -31,7 +31,7 @@ void enqueue(Queue& queue, char data) {
     }
 }
 
-void dequeue(Queue& queue) {
+void pop(Queue& queue) {
     if (isEmpty(queue)) {
         std::cout << "Kolejka jest pusta, nie da się usunac elementu." << std::endl;
     } else {
@@ -47,7 +47,7 @@ void dequeue(Queue& queue) {
     }
 }
 
-char getFront(const Queue& queue) {
+char first(const Queue& queue) {
     if (isEmpty(queue)) {
         std::cout << "Kolejka jest pusta." << std::endl;
         return '\0';
@@ -55,30 +55,10 @@ char getFront(const Queue& queue) {
         return queue.head->data;
     }
 }
-void dequeue2(Queue& queue) {
-    if (isEmpty(queue)) {
-        std::cout << "Kolejka jest pusta" << std::endl;
-    } else {
-        QueueNode* temp = queue.head;
-        queue.head = queue.head->next;
-
-        std::cout << "Element: " << temp->data << std::endl;
-        delete temp;
-
-        if (queue.head == nullptr) {
-            queue.tail = nullptr;
-        }
-    }
-}
-void seeQueue(Queue& queue) {
-    while (!isEmpty(queue)) {
-        dequeue2(queue);
-    }
-}
 
 void clearQueue(Queue& queue) {
     while (!isEmpty(queue)) {
-        dequeue(queue);
+        pop(queue);
     }
 }
 
@@ -93,7 +73,7 @@ void loadFromFile(Queue& queue, const std::string& filename) {
     char ch;
     while (file >> ch) {
         if (ch >= 'A' && ch <= 'Z') {
-            enqueue(queue, ch);
+            push(queue, ch);
         }
     }
 
@@ -115,7 +95,7 @@ void displayQueue(const Queue& queue){
     }
 }
 
-void displayMenu() {
+void Menu() {
     std::cout << "======== MENU ========" << std::endl;
     std::cout << "1. Sprawdz czy kolejka jest pusta" << std::endl;
     std::cout << "2. Dodaj element do kolejki" << std::endl;
@@ -134,14 +114,14 @@ int main() {
     queue.head = nullptr;
     queue.tail = nullptr;
 
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
 
     int choice;
     char element;
     std::string filename;
 
     do {
-        displayMenu();
+        Menu();
         std::cin >> choice;
 
         switch (choice) {
@@ -155,13 +135,13 @@ int main() {
             case 2:
                 std::cout << "Podaj element do dodania: ";
                 std::cin >> element;
-                enqueue(queue, element);
+                push(queue, element);
                 break;
             case 3:
-                dequeue(queue);
+                pop(queue);
                 break;
             case 4:
-                std::cout << "Pierwszy element w kolejce to: " << getFront(queue) << std::endl;
+                std::cout << "Pierwszy element w kolejce to: " << first(queue) << std::endl;
                 break;
             case 5:
                 clearQueue(queue);
