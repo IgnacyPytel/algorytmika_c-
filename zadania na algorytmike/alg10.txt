@@ -1,0 +1,149 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+
+struct QueueNode {
+    QueueNode* next;
+    char data;
+};
+
+struct Queue {
+    QueueNode* head;
+    QueueNode* tail;
+};
+
+bool isEmpty(const Queue& queue) {
+    return queue.head == nullptr;
+}
+
+void enqueue(Queue& queue, char data) {
+    QueueNode* newNode = new QueueNode;
+    newNode->data = data;
+    newNode->next = nullptr;
+
+    if (isEmpty(queue)) {
+        queue.head = newNode;
+        queue.tail = newNode;
+    } else {
+        queue.tail->next = newNode;
+        queue.tail = newNode;
+    }
+}
+
+void dequeue(Queue& queue) {
+    if (isEmpty(queue)) {
+        std::cout << "Kolejka jest pusta, nie da się usunąć elementu." << std::endl;
+    } else {
+        QueueNode* temp = queue.head;
+        queue.head = queue.head->next;
+
+        std::cout << "Usunięto element z kolejki: " << temp->data << std::endl;
+        delete temp;
+
+        if (queue.head == nullptr) {
+            queue.tail = nullptr;
+        }
+    }
+}
+
+char getFront(const Queue& queue) {
+    if (isEmpty(queue)) {
+        std::cout << "Kolejka jest pusta." << std::endl;
+        return '\0';
+    } else {
+        return queue.head->data;
+    }
+}
+
+void clearQueue(Queue& queue) {
+    while (!isEmpty(queue)) {
+        dequeue(queue);
+    }
+}
+
+void loadFromFile(Queue& queue, const std::string& filename) {
+    std::ifstream file(filename);
+
+    if (!file) {
+        std::cout << "Błąd otwarcia pliku." << std::endl;
+        return;
+    }
+
+    char ch;
+    while (file >> ch) {
+        if (ch >= 'A' && ch <= 'Z') {
+            enqueue(queue, ch);
+        }
+    }
+
+    file.close();
+}
+
+void displayMenu() {
+    std::cout << "======== MENU ========" << std::endl;
+    std::cout << "1. Sprawdź czy kolejka jest pusta" << std::endl;
+    std::cout << "2. Dodaj element do kolejki" << std::endl;
+    std::cout << "3. Usuń element z kolejki" << std::endl;
+    std::cout << "4. Pobierz pierwszy element z kolejki" << std::endl;
+    std::cout << "5. Usuń wszystkie elementy z kolejki" << std::endl;
+    std::cout << "6. Wczytaj duże litery z pliku" << std::endl;
+    std::cout << "7. Wyjście" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "Wybierz opcję: ";
+}
+
+int main() {
+    Queue queue;
+    queue.head = nullptr;
+    queue.tail = nullptr;
+
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+    int choice;
+    char element;
+    std::string filename;
+
+    do {
+        displayMenu();
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:
+                if (isEmpty(queue)) {
+                    std::cout << "Kolejka jest pusta." << std::endl;
+                } else {
+                    std::cout << "Kolejka nie jest pusta.";
+                }
+                break;
+            case 2:
+                std::cout << "Podaj element do dodania: ";
+                std::cin >> element;
+                enqueue(queue, element);
+                break;
+            case 3:
+                dequeue(queue);
+                break;
+            case 4:
+                std::cout << "Pierwszy element w kolejce to: " << getFront(queue) << std::endl;
+                break;
+            case 5:
+                clearQueue(queue);
+                std::cout << "Usunięto wszystkie elementy z kolejki." << std::endl;
+                break;
+            case 6:
+                std::cout << "Podaj nazwę pliku: ";
+                std::cin >> filename;
+                loadFromFile(queue, filename);
+                break;
+            case 7:
+                std::cout << "Do widzenia!" << std::endl;
+                break;
+            default:
+                std::cout << "Nieznana opcja. Wybierz ponownie." << std::endl;
+                break;
+        }
+    } while (choice != 7);
+
+    return 0;
+}
