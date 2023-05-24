@@ -1,0 +1,344 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+struct element{
+    int data;
+    element* next;
+};
+
+struct single_list{
+    element* head;
+    element* tail;
+    int counter;
+};
+bool isEmpty(const single_list* list){
+    return list->head == nullptr;
+}
+
+void add_tail(single_list* list, int value){
+    element* newelement = new element;
+    newelement->data = value;
+    newelement->next = nullptr;
+    if(isEmpty(list)){
+        list->head = newelement;
+        list->tail = newelement;
+    }
+    else{
+        list->tail->next = newelement;
+        list->tail = newelement;
+    }
+    list->counter++;
+
+}
+
+void add_head(single_list* list, int value){
+    element* newelement = new element;
+    newelement->data = value;
+    newelement->next = nullptr;
+    if(isEmpty(list)){
+        list->head = newelement;
+        list->tail = newelement;
+    }
+    else{
+        newelement->next = list->head;
+        list->head = newelement;
+    }
+    list->counter++;
+}
+void add_position(single_list* list, int value, int position){
+    if (position <0 || position > list->counter){
+        std::cout<<"Niepoprawna pozycja"<<std::endl;
+        return;
+    }
+    if(position == 0){
+        add_head(list,value);
+    }
+    else if (position == list->counter){
+        add_tail(list,value);
+    }
+    else{
+        element* newelement = new element;
+        newelement->data = value;
+        element* current = list->head;
+        for(int i=0; i<position - 1;i++){
+            current = current->next;
+        }
+        newelement->next = current->next;
+        current->next = newelement;
+        list->counter++;
+    }
+
+}
+void delete_tail(single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+        return;
+    }
+    if(list->head == list->tail){
+        delete list->head;
+        list->head=nullptr;
+        list->tail=nullptr;
+    }
+    else{
+        element* current = list->head;
+        while(current->next != list->tail){
+            current = current->next;
+        }
+        delete list->tail;
+        current->next = nullptr;
+        list->tail = current;
+    }
+    list->counter--;
+}
+void delete_head(single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+        return;
+    }
+    element* current = list->head;
+    list->head = list->head->next;
+    delete current;
+    if(list->head == nullptr){
+        list->tail = nullptr;
+    }
+
+    list->counter--;
+}
+void delete_position(single_list* list, int position){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+        return;
+    }
+    if (position <0 || position > list->counter){
+        std::cout<<"Niepoprawna pozycja"<<std::endl;
+        return;
+    }
+    if(position == 0){
+        delete_head(list);
+    }
+    else if (position == list->counter){
+        delete_tail(list);
+    }
+    else{
+        element* current = list->head;
+        for(int i = 0; i < position -1; i++){
+            current = current->next;
+        }
+        element* usuniety = current->next;
+        current->next = usuniety->next;
+        delete usuniety;
+    }
+    list->counter--;
+}
+void show(const single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+        return;
+    }
+    element* current = list->head;
+    while(current != nullptr){
+        std::cout<< current->data<<" ";
+        current = current->next;
+    }
+    std::cout<< std::endl;
+}
+void init(single_list* list){
+    list->head = nullptr;
+    list->tail = nullptr;
+    list ->counter = 0;
+}
+int getFirst(const single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+
+    }
+    return list->head->data;
+}
+int getLast(const single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+
+    }
+    return list->tail->data;
+}
+void clearList(single_list* list){
+    element* current = list->head;
+    while(current != nullptr){
+        element* usuniety = current;
+        current = current->next;
+        delete usuniety;
+    }
+    list ->head = nullptr;
+    list->tail = nullptr;
+    list->counter = 0;
+}
+double Average(const single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+        return 0.0;
+    }
+    double sum=0;
+    element* current = list->head;
+    while(current != nullptr){
+        sum+= current->data;
+        current = current->next;
+    }
+    return sum/list->counter;
+}
+
+void findMax(const single_list* list){
+    if (isEmpty(list)){
+        std::cout<<"Lista jest pusta"<<std::endl;
+    }
+    int maxElement = list->head->data;
+    int maxPosition = 0;
+    int currentPosition = 0;
+    element* current = list->head->next;
+    while(current != nullptr){
+        if(current->data > maxElement){
+            maxElement = current->data;
+            maxPosition = currentPosition;
+        }
+        current = current->next;
+        currentPosition++;
+    }
+
+    cout<<"Maksymalny element to: "<<maxElement<<" na pozycji: "<<maxPosition<<endl;
+}
+
+void Menu() {
+    std::cout << "======== MENU ========" << std::endl;
+    std::cout << "1. Sprawdz czy lista jest pusta" << std::endl;
+    std::cout << "2. Dodaj element na koniec listy" << std::endl;
+    std::cout << "3. Dodaj element na poczatek listy" << std::endl;
+    std::cout << "4. Dodaj element na okreslona pozycje" << std::endl;
+    std::cout << "5. Usun element z konca listy" << std::endl;
+    std::cout << "6. Usun element z poczatku listy" << std::endl;
+    std::cout << "7. Usun element z wybranej pozycji" << std::endl;
+    std::cout << "8. Pobierz pierwszy element z listy" << std::endl;
+    std::cout << "9. Pobierz ostatni element z listy" << std::endl;
+    std::cout << "10. Wyswietl ostatni element z listy" << std::endl;
+    std::cout << "11. Policz srednia arytmetyczna dla elementow w liscie" << std::endl;
+    std::cout << "12. Znajdz maksymalny element w liscie" << std::endl;
+    std::cout << "13. Wyswietlenie calej listy" << std::endl;
+    std::cout << "14. Usuniecie calej listy" << std::endl;
+    std::cout << "15. Wyjscie" << std::endl;
+    std::cout << "=======================" << std::endl;
+    std::cout << "Wybierz opcje: ";
+}
+
+
+
+
+
+int main()
+{
+
+    single_list list;
+    init(&list);
+    int choice;
+   do {
+        Menu();
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:{
+                if(isEmpty(&list)){
+                    std::cout<<"Lista jest pusta"<<std::endl;
+                }
+                else{
+                    std::cout<<"Lista nie jest pusta"<<std::endl;
+                }
+                break;
+            }
+            case 2:{
+                int value = rand() % 50+1;
+                add_tail(&list, value);
+                std::cout<<"Dodano: "<<value<<" na koniec listy"<<endl;
+                break;
+            }
+            case 3:{
+                int value = rand() % 50+1;
+                add_head(&list, value);
+                std::cout<<"Dodano: "<<value<<" na poczatek listy"<<endl;
+                break;
+            }
+            case 4:{
+                int value = rand() % 50+1;
+                int position;
+                std::cout<<"Wprowadz pozycje na ktora chcesz dodac "<<endl;
+                std::cin>>position;
+                add_position(&list, value, position);
+                std::cout<<"Dodano: "<<value<<" na pozycji: "<<position<<endl;
+                break;
+            }
+            case 5:{
+                delete_tail(&list);
+                std::cout<<"Usunieto element z konca listy "<<endl;
+                break;
+            }
+            case 6:{
+                delete_head(&list);
+                std::cout<<"Usunieto element z poczatku listy"<<endl;
+                break;
+            }
+            case 7:{
+               int value = rand() % 50+1;
+               int position;
+               std::cout<<"Wprowadz pozycje z ktorej chcesz usunac "<<endl;
+               std::cin>>position;
+               delete_position(&list,position);
+               std::cout<<"Usunieto: "<<value<<" na pozycji: "<<position<<endl;
+               break;
+            }
+            case 8:{
+                int first = getFirst(&list);
+                std::cout<<"Pierwszym elementem jest: "<<first<<endl;
+                break;
+            }
+            case 9:{
+                int last = getLast(&list);
+                std::cout<<"Ostatnim elementem jest: "<<last<<endl;
+                break;
+            }
+            case 10:{
+                int last = getLast(&list);
+                std::cout<<"Ostatnim elementem jest: "<<last<<endl;
+                break;
+            }
+            case 11:{
+                double average = Average(&list);
+                std::cout<<"Srednia elementow tej listy wynosi: "<<average<<endl;
+                break;
+            }
+            case 12:{
+                findMax(&list);
+                break;
+            }
+            case 13:{
+                show(&list);
+                break;
+            }
+            case 14:{
+                clearList(&list);
+                std::cout<<"Lista usunieta."<<endl;
+                break;
+            }
+            case 15:{
+                std::cout << "Do widzenia!" << std::endl;
+                break;
+            }
+            default:{
+                std::cout << "Nieznana opcja. Wybierz ponownie." << std::endl;
+                break;
+            }
+        }
+    } while (choice != 15);
+
+    return 0;
+}
+
+
+
