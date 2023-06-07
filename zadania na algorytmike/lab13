@@ -1,0 +1,103 @@
+#include <iostream>
+#include <fstream>
+
+struct Student {
+    std::string imie;
+    std::string nazwisko;
+    int punkty;
+};
+
+void wczytywanie(Student* students, int& size) {
+    std::ifstream file("studenci.csv");
+    if (!file) {
+        std::cout << "Nie można otworzyć pliku studenci.csv\n";
+        return;
+    }
+
+    file >> size;
+
+    for (int i = 0; i < size; i++) {
+        file >> students[i].imie >> students[i].nazwisko >> students[i].punkty;
+    }
+
+    file.close();
+}
+
+void wypisywanie(Student* students, int size) {
+    for (int i = 0; i < size; i++) {
+        std::cout << students[i].imie << " " << students[i].nazwisko << " " << students[i].punkty << std::endl;
+    }
+}
+
+void heapify(Student* students, int size, int root, bool tryb) {
+    int largest = root;
+    int left = 2 * root + 1;
+    int right = 2 * root + 2;
+
+    if (tryb) {
+        if (left < size && students[left].punkty > students[largest].punkty) {
+            largest = left;
+        }
+
+        if (right < size && students[right].punkty > students[largest].punkty) {
+            largest = right;
+        }
+    } else {
+        if (left < size && students[left].punkty < students[largest].punkty) {
+            largest = left;
+        }
+
+        if (right < size && students[right].punkty < students[largest].punkty) {
+            largest = right;
+        }
+    }
+
+    if (largest != root) {
+        std::swap(students[root], students[largest]);
+        heapify(students, size, largest, tryb);
+    }
+}
+
+void tworzenie_kopca(Student* students, int size, bool tryb) {
+    for (int i = size / 2 - 1; i >= 0; i--) {
+        heapify(students, size, i, tryb);
+    }
+}
+
+void rozbieranie_kopca(Student* students, int size, bool tryb) {
+    for (int i = size - 1; i >= 0; i--) {
+        std::swap(students[0], students[i]);
+        heapify(students, i, 0, tryb);
+    }
+}
+
+void sortowanie_kopca(Student* students, int size, bool tryb) {
+    tworzenie_kopca(students, size, tryb);
+    rozbieranie_kopca(students, size, tryb);
+}
+
+int main() {
+    int size;
+    std::cout << "Podaj rozmiar tablicy: ";
+    std::cin >> size;
+
+    Student* students = new Student[size];
+
+    wczytywanie(students, size);
+
+    bool tryb;
+    std::cout << "Podaj tryb sortowania (0 - malejąco, 1 - rosnąco): ";
+    std::cin >> tryb;
+
+    std::cout << "Dane przed sortowaniem:\n";
+    wypisywanie(students, size);
+
+    sortowanie_kopca(students, size, tryb);
+
+    std::cout << "Dane po sortowaniu:\n";
+    wypisywanie(students, size);
+
+    delete[] students;
+
+    return 0;
+}
