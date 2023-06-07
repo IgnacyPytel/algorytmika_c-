@@ -1,103 +1,117 @@
 #include <iostream>
+#include <string>
 #include <fstream>
+#include <algorithm>
+#include <sstream>
 
-struct Student {
-    std::string imie;
-    std::string nazwisko;
+using namespace std;
+
+struct student {
+    string imie;
+    string nazwisko;
     int punkty;
+
 };
 
-void wczytywanie(Student* students, int& size) {
-    std::ifstream file("studenci.csv");
-    if (!file) {
-        std::cout << "Nie można otworzyć pliku studenci.csv\n";
-        return;
+void wczytajStudentow(student*& tab, int& liczbaStudentow) {
+    string sciezka, linia, pomoc;
+    ifstream plik;
+    char sredniki;
+    sciezka = "studenci.csv";
+    plik.open(sciezka);
+    plik >> liczbaStudentow;
+    for (int i = 0; i < 2; i++) {
+    plik >> sredniki;
     }
-
-    file >> size;
-
-    for (int i = 0; i < size; i++) {
-        file >> students[i].imie >> students[i].nazwisko >> students[i].punkty;
+    tab = new student[liczbaStudentow];
+    for (int i = 0; i < liczbaStudentow; i++) {
+        plik >> linia;
+        stringstream ss(linia);
+        getline(ss, tab[i].imie, ';');
+        getline(ss, tab[i].nazwisko, ';');
+        getline(ss, pomoc);
+        tab[i].punkty = atoi(pomoc.c_str());
     }
-
-    file.close();
+    plik.close();
 }
 
-void wypisywanie(Student* students, int size) {
-    for (int i = 0; i < size; i++) {
-        std::cout << students[i].imie << " " << students[i].nazwisko << " " << students[i].punkty << std::endl;
-    }
-}
-
-void heapify(Student* students, int size, int root, bool tryb) {
-    int largest = root;
-    int left = 2 * root + 1;
-    int right = 2 * root + 2;
-
-    if (tryb) {
-        if (left < size && students[left].punkty > students[largest].punkty) {
-            largest = left;
+void tworzene_kopca(student*& tab, int& liczbaStudentow) {
+    int i = 1;
+    while (i < liczbaStudentow) {
+        int j = i;
+        int k = (j - 1) / 2;
+        student x = tab[i];
+        while (j > 0 && tab[k].punkty < x.punkty) {
+            tab[j].punkty = tab[k].punkty;
+            j = k;
+            k = (j - 1) / 2;
         }
-
-        if (right < size && students[right].punkty > students[largest].punkty) {
-            largest = right;
-        }
-    } else {
-        if (left < size && students[left].punkty < students[largest].punkty) {
-            largest = left;
-        }
-
-        if (right < size && students[right].punkty < students[largest].punkty) {
-            largest = right;
-        }
-    }
-
-    if (largest != root) {
-        std::swap(students[root], students[largest]);
-        heapify(students, size, largest, tryb);
+        tab[j] = x;
+        i++;
     }
 }
 
-void tworzenie_kopca(Student* students, int size, bool tryb) {
-    for (int i = size / 2 - 1; i >= 0; i--) {
-        heapify(students, size, i, tryb);
+void rozbieranie_kopca(student*& tab, int& liczbaStudentow) {
+    int i = liczbaStudentow - 1;
+    while (i > 0) {
+        swap(tab[0], tab[i]);
+        int j = 0;
+        int k = 1;
+        int m;
+        while (k < i) {
+            if (k + 1 < i && tab[k + 1].punkty > tab[k].punkty) {
+                m = k + 1;
+            }
+            else {
+                m = k;
+            }
+            if (tab[m].punkty <= tab[j].punkty) {
+                break;
+            }
+            swap(tab[j], tab[m]);
+            j = m;
+            k = 2 * j + 1;
+        }
+        i--;
     }
 }
 
-void rozbieranie_kopca(Student* students, int size, bool tryb) {
-    for (int i = size - 1; i >= 0; i--) {
-        std::swap(students[0], students[i]);
-        heapify(students, i, 0, tryb);
+void wypisywanie(student*& tab, int& liczbaStudentow) {
+    for (int i = 0; i < liczbaStudentow; i++) {
+        cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << endl;
     }
 }
 
-void sortowanie_kopca(Student* students, int size, bool tryb) {
-    tworzenie_kopca(students, size, tryb);
-    rozbieranie_kopca(students, size, tryb);
+bool punktyASC(const student& a, const student& b) {
+    return a.punkty < b.punkty;
+}
+
+bool punktyDESC(const student& a, const student& b) {
+    return a.punkty > b.punkty;
+}
+
+void sortujStudentow(student*& tab, int& liczbaStudentow, bool malejaco) {
+    if (malejaco) {
+        sort(tab, tab + liczbaStudentow, punktyDESC);
+    }
+
+    else {
+        sort(tab, tab + liczbaStudentow, punktyASC);
+    }
 }
 
 int main() {
-    int size;
-    std::cout << "Podaj rozmiar tablicy: ";
-    std::cin >> size;
-
-    Student* students = new Student[size];
-
-    wczytywanie(students, size);
-
-    bool tryb;
-    std::cout << "Podaj tryb sortowania (0 - malejąco, 1 - rosnąco): ";
-    std::cin >> tryb;
-
-    std::cout << "Dane przed sortowaniem:\n";
-    wypisywanie(students, size);
-
-    sortowanie_kopca(students, size, tryb);
-
-    std::cout << "Dane po sortowaniu:\n";
-    wypisywanie(students, size);
-
-    delete[] students;
-
+    student* tab;
+    int liczbaStudentow;
+    wczytajStudentow(tab, liczbaStudentow);
+    wypisywanie(tab, liczbaStudentow);
+    int tryb;
+    cout << "Wybierz tryb sortowania (0 - rosnaco, 1 - malejaco): ";
+    cin >> tryb;
+    tworzene_kopca(tab, liczbaStudentow);
+    rozbieranie_kopca(tab, liczbaStudentow);
+    sortujStudentow(tab, liczbaStudentow, tryb == 1);
+    wypisywanie(tab, liczbaStudentow);
+    delete[] tab;
     return 0;
 }
