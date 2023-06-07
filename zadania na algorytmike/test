@@ -1,63 +1,208 @@
-
 #include <iostream>
+
 #include <string>
+
 #include <fstream>
+
 #include <algorithm>
+
 #include <sstream>
 
 using namespace std;
 
-struct student{
+struct student {
+
     string imie;
+
     string nazwisko;
+
     int punkty;
+
 };
 
-void wczytajStudentow(student*&tab, int &liczbaStudentow){
-    string sciezka,linia,pomoc;
+void wczytajStudentow(student*& tab, int& liczbaStudentow) {
+
+    string sciezka, linia, pomoc;
+
     ifstream plik;
+
     char sredniki;
+
     sciezka = "studenci.csv";
+
     plik.open(sciezka);
-    plik>>liczbaStudentow;
-    for(int i = 0; i<2;i++){
+
+    plik >> liczbaStudentow;
+
+    for (int i = 0; i < 2; i++) {
+
         plik >> sredniki;
+
     }
-    tab =  new student[liczbaStudentow];
-    for(int i = 0;  i<liczbaStudentow; i++){
-        plik>>linia;
+
+    tab = new student[liczbaStudentow];
+
+    for (int i = 0; i < liczbaStudentow; i++) {
+
+        plik >> linia;
+
         stringstream ss(linia);
-        getline(ss,tab[i].imie, ';');
+
+        getline(ss, tab[i].imie, ';');
+
         getline(ss, tab[i].nazwisko, ';');
+
         getline(ss, pomoc);
-        tab[i].punkty=atoi(pomoc.c_str());
+
+        tab[i].punkty = atoi(pomoc.c_str());
+
     }
+
     plik.close();
+
 }
 
-void tworzene_kopca(student*&tab, int &liczbaStudentow){
-    int i=1;
-    while(i<liczbaStudentow){
+void tworzene_kopca(student*& tab, int& liczbaStudentow) {
+
+    int i = 1;
+
+    while (i < liczbaStudentow) {
+
         int j = i;
-        int k = (int)(j-1)/2;
+
+        int k = (j - 1) / 2;
+
         int x = tab[i].punkty;
-        while(j>0 && tab[k].punkty < x){
+
+        while (j > 0 && tab[k].punkty < x) {
+
             tab[j].punkty = tab[k].punkty;
-            j=k;
-            k=(int)(j-1)/2;
+
+            j = k;
+
+            k = (j - 1) / 2;
+
         }
-        tab[j].punkty=x;
+
+        tab[j].punkty = x;
+
+        i++;
+
     }
-    i++;
+
 }
 
-void rozbieranie_kopca(student*&tab, int &liczbaStudentow){
-    int i = liczbaStudentow - 1;
-    while (i>0){
-        swap(tab[0],tab[i]);
-        int j = 0;
-        int k = 1;
-        int m;
-        while (k<i){
+void rozbieranie_kopca(student*& tab, int& liczbaStudentow) {
 
-            if(k+1<i && tab[k+1].punkty>tab[k].punkty){
+    int i = liczbaStudentow - 1;
+
+    while (i > 0) {
+
+        swap(tab[0], tab[i]);
+
+        int j = 0;
+
+        int k = 1;
+
+        int m;
+
+        while (k < i) {
+
+            if (k + 1 < i && tab[k + 1].punkty > tab[k].punkty) {
+
+                m = k + 1;
+
+            }
+
+            else {
+
+                m = k;
+
+            }
+
+            if (tab[m].punkty <= tab[j].punkty) {
+
+                break;
+
+            }
+
+            swap(tab[j], tab[m]);
+
+            j = m;
+
+            k = 2 * j + 1;
+
+        }
+
+        i--;
+
+    }
+
+}
+
+void wypisywanie(student*& tab, int& liczbaStudentow) {
+
+    for (int i = 0; i < liczbaStudentow; i++) {
+
+        cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << endl;
+
+    }
+
+}
+
+bool compareStudentPointsAsc(const student& a, const student& b) {
+
+    return a.punkty < b.punkty;
+
+}
+
+bool compareStudentPointsDesc(const student& a, const student& b) {
+
+    return a.punkty > b.punkty;
+
+}
+
+void sortujStudentow(student*& tab, int& liczbaStudentow, bool malejaco) {
+
+    if (malejaco) {
+
+        sort(tab, tab + liczbaStudentow, compareStudentPointsDesc);
+
+    }
+
+    else {
+
+        sort(tab, tab + liczbaStudentow, compareStudentPointsAsc);
+
+    }
+
+}
+
+int main() {
+
+    student* tab;
+
+    int liczbaStudentow;
+
+    wczytajStudentow(tab, liczbaStudentow);
+
+    int tryb;
+
+    cout << "Wybierz tryb sortowania (0 - rosnaco, 1 - malejaco): ";
+
+    cin >> tryb;
+
+    tworzene_kopca(tab, liczbaStudentow);
+
+    rozbieranie_kopca(tab, liczbaStudentow);
+
+    sortujStudentow(tab, liczbaStudentow, tryb == 1);
+
+    wypisywanie(tab, liczbaStudentow);
+
+    delete[] tab;
+
+    return 0;
+
+}
+
