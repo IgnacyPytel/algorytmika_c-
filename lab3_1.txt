@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+double InterpolacjaLagrange(const std::vector<double>& x, const std::vector<double>& y, double point) {
+    double wynik = 0.0;
+    for (int i = 0; i < x.size(); i++) {
+        double wartosc = y[i];
+        for (int j = 0; j < x.size(); j++) {
+            if (j != i) {
+                wartosc *= (point - x[j]) / (x[i] - x[j]);
+            }
+        }
+        wynik += wartosc;
+    }
+    return wynik;
+}
+
+int main() {
+    int n;
+
+    // Pobieranie liczby wezlow
+    std::cout << "Podaj liczbe wezlow: ";
+    std::cin >> n;
+    // Pierwszy warunek do interpolacji 
+    if (n < 2) {
+        std::cout << "Potrzeba co najmniej 2 wezlow do interpolacji." << std::endl;
+        return 1;
+    }
+
+    std::vector<double> x(n); // Wartosci wezlow
+    std::vector<double> y(n); // Wartosci funkcji w wezlac
+
+    // Pobieranie wartosci
+    for (int i = 0; i < n; i++) {
+        std::cout << "Podaj x" << i << ": ";
+        std::cin >> x[i];
+        std::cout << "Podaj y" << i << ": ";
+        std::cin >> y[i];
+    }
+    // Potrzebne do ustalenia granic mozliwosci liczenia wartosci W(x) dla jakiegos podanego punktu
+    double min_x = *min_element(x.begin(), x.end());
+    double max_x = *max_element(x.begin(), x.end());
+
+    // Pobieranie punktu do obliczenia wartosci W(x)
+    double point;
+    std::cout << "Podaj punkt, w ktorym chcesz obliczyc wartosc wielomianu: ";
+    std::cin >> point;
+    // Drugi warunek do interpolacji 
+    if (point < min_x || point > max_x) {
+        std::cout << "Podany punkt musi znajdowac sie w zakresie od " << min_x << " do " << max_x << "." << std::endl;
+        return 1;
+    }
+
+    double result = InterpolacjaLagrange(x, y, point);
+    std::cout << "Wartosc wielomianu w punkcie " << point << " wynosi: " << result << std::endl;
+
+    return 0;
+}

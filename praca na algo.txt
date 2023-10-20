@@ -1,0 +1,80 @@
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <algorithm>
+
+std::vector<int> WyliczParametry(std::vector<int> parametr, int stopien, int punkt) {
+    std::vector<int> noweParametry(std::move(parametr));
+
+    for (int i = 0; i < stopien; i++) {
+        for (int j = 1; j <= stopien - i; j++) {
+            noweParametry[j] = noweParametry[j] + noweParametry[j - 1] * punkt;
+        }
+    }
+
+    return noweParametry;
+}
+
+int silnia(int n) {
+    int result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
+std::vector<int> WyliczPochodne(const std::vector<int>& noweParametry, int stopien) {
+    std::vector<int> wartosciPochodnych(stopien + 1);
+
+    for (int i = noweParametry.size() - 1; i >= 0; i--) {
+        int wynik = noweParametry[i] * silnia(noweParametry.size()-i-1);
+        wartosciPochodnych[i]=wynik;
+    }
+    std::reverse(wartosciPochodnych.begin(), wartosciPochodnych.end());
+    return wartosciPochodnych;
+}
+
+
+
+int main() {
+    int stopien;
+    std::cout << "Podaj stopien wielomianu: ";
+    std::cin >> stopien;
+
+    std::vector<int> parametr(stopien + 1);
+
+    for (int i = 0; i <= stopien; i++) {
+        std::cout << "Podaj wspolczynnik a" << i << ": ";
+        std::cin >> parametr[i];
+        std::cout<<std::endl;
+    }
+
+    int punkt;
+    std::cout << "Podaj punkt x: ";
+    std::cin >> punkt;
+
+    std::vector<int> noweParametry = WyliczParametry(parametr, stopien, punkt);
+    std::vector<int> wartosciPochodnych = WyliczPochodne(noweParametry,stopien);
+
+    std::cout<<std::endl;
+    std::cout << "Nowe wspolczynniki wielomianu po obliczeniach: [";
+    for (int i = 0; i <= stopien; i++) {
+        std::cout << noweParametry[i];
+        if (i < stopien) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << "]"<< std::endl;
+    std::cout << "Pochodne tego wielomianu w podanym punkcie maja wartosci :[";
+    for (int i = 1; i <= stopien; i++) {
+        std::cout << wartosciPochodnych[i];
+        if (i < stopien) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "Wielomian w podanym punkcie ma wartosc :[";
+    std::cout << wartosciPochodnych[0];
+    std::cout << "]" << std::endl;
+    return 0;
+}
