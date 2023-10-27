@@ -1,0 +1,76 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <execution>
+
+double InterpolacjaNewtona(std::vector<double> x, std::vector<double> fi, double punkt) {
+    unsigned int liczbaWezlow = x.size();
+    if (liczbaWezlow != fi.size()) {
+        throw std::invalid_argument("Liczba wezlow i wartosci funkcji musi byc taka sama");
+    }
+
+    std::vector<double> IlorazRoznicowy(fi.begin(), fi.end());
+
+    for (unsigned int j = 1; j < liczbaWezlow; j++) {
+        for (unsigned int i = liczbaWezlow - 1; i >= j; i--) {
+            IlorazRoznicowy[i] = (IlorazRoznicowy[i] - IlorazRoznicowy[i - 1]) / (x[i] - x[i - j]);
+        }
+    }
+
+    //Obliczanie wartosci wielomianu Newtona w punkcie p
+    double wynik = IlorazRoznicowy[0];
+    double iloczyn_x = 1;
+    for (unsigned int i = 1; i < liczbaWezlow; i++) {
+        iloczyn_x *= (punkt - x[i - 1]);
+        wynik += IlorazRoznicowy[i] * iloczyn_x;
+    }
+
+    return wynik;
+}
+
+int main() {
+    int liczbaWezlow;
+    double punkt;
+    std::cout << "Podaj liczbe wezlow: ";
+    std::cin >> liczbaWezlow;
+
+    std::vector<double> wartosci_x;
+    std::vector<double> wartosci_fi;
+
+    for (int i = 0; i < liczbaWezlow; i++) {
+        double x, y;
+        std::cout << "Podaj wartosc wezla " << i + 1 << ": ";
+        std::cin >> x;
+        std::cout << "Podaj wartosc funkcji w wezle " << i + 1 << ": ";
+        std::cin >> y;
+        wartosci_x.push_back(x);
+        wartosci_fi.push_back(y);
+    }
+
+    std::cout << "Podaj punkt p: ";
+    std::cin >> punkt;
+
+    /* Kluczowe sortowanie aby zalozenia interpolacji byly odpowiednio sprawdzane
+    std::execution::par -> powoduje sortowanie od poczatku i od konca
+     sort -> z stl sam wybiera odpowiedni typ sortowania */
+
+    std::sort(std::execution::par,wartosci_x.begin(), wartosci_x.end());
+    double minimalny = wartosci_x[0];
+    double maksymalny = wartosci_x[wartosci_x.size() - 1];
+
+    //Sprawdzenie zalozen interpolacji (dwa wezly nie moga miec takiej samej wartosci)
+    for (int i = 1; i < liczbaWezlow; i++) {
+        if (wartosci_x[i] == wartosci_x[i - 1]) {
+            throw std::invalid_argument("Dwa wezly maja takie same wartosci, nie mozna przeprowadzic interpolacji.");
+        }
+    }
+    /* uzywam throw expectations aby ogarniac bledy */
+    if (punkt < minimalny || punkt > maksymalny) {
+        throw std::out_of_range("Punkt p wykracza poza zakresem min i max, nie mozna przeprowadzic interpolacji.");
+    }
+
+    double result = InterpolacjaNewtona(wartosci_x, wartosci_fi, punkt);
+    std::cout << "Przyblizona wartosc funkcji w punkcie: " << punkt << " wynosi: " << result << std::endl;
+
+    return 0;
+}
