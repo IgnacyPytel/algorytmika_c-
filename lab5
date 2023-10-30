@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Funkcja obliczająca przybliżoną wartość funkcji f w punkcie p za pomocą algorytmu Neville'a
+double nevilleInterpolation(const vector<double>& wezly, const vector<double>& wartosci, double p) {
+    int n = wezly.size();
+    vector<vector<double>> dp(n, vector<double>(n, 0));
+
+    for (int i = 0; i < n; i++) {
+        dp[i][0] = wartosci[i];
+    }
+
+    for (int j = 1; j < n; j++) {
+        for (int i = 0; i < n - j; i++) {
+            dp[i][j] = ((p - wezly[i + j]) * dp[i][j - 1] - (p - wezly[i]) * dp[i + 1][j - 1]) / (wezly[i] - wezly[i + j]);
+        }
+    }
+
+    return dp[0][n - 1];
+}
+
+int main() {
+    int n;
+    cout << "Podaj liczbe wezlow: ";
+    cin >> n;
+
+    vector<double> wezly(n);
+    vector<double> wartosci(n);
+
+    cout << "Podaj wartosci wezlow:\n";
+    for (int i = 0; i < n; i++) {
+        cout << "Wezel " << i + 1 << ": ";
+        cin >> wezly[i];
+    }
+
+    cout << "Podaj wartosci funkcji w tych wezlow:\n";
+    for (int i = 0; i < n; i++) {
+        cout << "Wartosc funkcji w wezle " << i + 1 << ": ";
+        cin >> wartosci[i];
+    }
+
+    double p;
+    cout << "Podaj punkt p: ";
+    cin >> p;
+
+    // Sprawdzamy założenie interpolacji
+    for (int i = 1; i < n; i++) {
+        if (wezly[i] == wezly[i - 1]) {
+            cout << "Blad: Wezly interpolacyjne sa rownolegle. Nie mozna zastosowac metody Neville'a." << endl;
+            return 1;
+        }
+    }
+
+    double wynik = nevilleInterpolation(wezly, wartosci, p);
+
+    cout << "Przyblizona wartosc funkcji w punkcie " << p << " to: " << wynik << endl;
+
+    return 0;
+}
